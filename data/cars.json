@@ -1,0 +1,124 @@
+{
+    "cars": [
+        {
+            "mileage": 20000,
+            "age": 2,
+            "engine_size": 1.6,
+            "horsepower": 120,
+            "fuel_efficiency": 6.5,
+            "price": 25000
+        },
+        {
+            "mileage": 50000,
+            "age": 3,
+            "engine_size": 2.0,
+            "horsepower": 150,
+            "fuel_efficiency": 7.0,
+            "price": 22000
+        },
+        {
+            "mileage": 80000,
+            "age": 5,
+            "engine_size": 2.5,
+            "horsepower": 200,
+            "fuel_efficiency": 8.5,
+            "price": 18000
+        },
+        {
+            "mileage": 30000,
+            "age": 1,
+            "engine_size": 1.8,
+            "horsepower": 140,
+            "fuel_efficiency": 6.8,
+            "price": 28000
+        },
+        {
+            "mileage": 120000,
+            "age": 8,
+            "engine_size": 3.0,
+            "horsepower": 250,
+            "fuel_efficiency": 9.5,
+            "price": 15000
+        },
+        {
+            "mileage": 15000,
+            "age": 1,
+            "engine_size": 1.4,
+            "horsepower": 100,
+            "fuel_efficiency": 5.8,
+            "price": 22000
+        },
+        {
+            "mileage": 95000,
+            "age": 6,
+            "engine_size": 2.2,
+            "horsepower": 180,
+            "fuel_efficiency": 8.0,
+            "price": 16000
+        },
+        {
+            "mileage": 45000,
+            "age": 3,
+            "engine_size": 1.5,
+            "horsepower": 110,
+            "fuel_efficiency": 6.2,
+            "price": 19000
+        },
+        {
+            "mileage": 180000,
+            "age": 10,
+            "engine_size": 3.5,
+            "horsepower": 300,
+            "fuel_efficiency": 11.0,
+            "price": 12000
+        },
+        {
+            "mileage": 25000,
+            "age": 2,
+            "engine_size": 2.0,
+            "horsepower": 160,
+            "fuel_efficiency": 7.2,
+            "price": 26000
+        },
+        {
+            "mileage": 70000,
+            "age": 4,
+            "engine_size": 2.8,
+            "horsepower": 220,
+            "fuel_efficiency": 9.0,
+            "price": 20000
+        },
+        {
+            "mileage": 40000,
+            "age": 2,
+            "engine_size": 1.6,
+            "horsepower": 130,
+            "fuel_efficiency": 6.4,
+            "price": 23000
+        },
+        {
+            "mileage": 110000,
+            "age": 7,
+            "engine_size": 2.4,
+            "horsepower": 190,
+            "fuel_efficiency": 8.8,
+            "price": 14000
+        },
+        {
+            "mileage": 60000,
+            "age": 4,
+            "engine_size": 2.2,
+            "horsepower": 170,
+            "fuel_efficiency": 7.8,
+            "price": 21000
+        },
+        {
+            "mileage": 35000,
+            "age": 2,
+            "engine_size": 1.8,
+            "horsepower": 145,
+            "fuel_efficiency": 7.0,
+            "price": 24000
+        }
+    ]
+} 

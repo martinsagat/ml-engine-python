@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Conversation Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .chat-container {
+            height: calc(100vh - 200px);
+        }
+        .message {
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .user-message {
+            margin-left: auto;
+            background-color: #e3f2fd;
+        }
+        .bot-message {
+            margin-right: auto;
+            background-color: #f5f5f5;
+        }
+        .typing-indicator {
+            display: none;
+        }
+        .typing-indicator.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">AI Conversation Interface</h1>
+            
+            <!-- Chat Container -->
+            <div class="chat-container overflow-y-auto mb-4 p-4 bg-gray-50 rounded-lg">
+                <div id="chat-messages" class="space-y-4">
+                    <!-- Welcome message -->
+                    <div class="message bot-message p-3 rounded-lg">
+                        Hello! I'm your AI assistant. How can I help you today?
+                    </div>
+                </div>
+                <!-- Typing indicator -->
+                <div class="typing-indicator message bot-message p-3 rounded-lg mt-4">
+                    <div class="flex space-x-2">
+                        <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce"></div>
+                        <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        <div class="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="flex space-x-4">
+                <input type="text" id="message-input" 
+                       class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="Type your message...">
+                <button id="send-button" 
+                        class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Send
+                </button>
+            </div>
+
+            <!-- Analysis Tools -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button id="analyze-sentiment" 
+                        class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <i class="fas fa-smile mr-2"></i> Analyze Sentiment
+                </button>
+                <button id="extract-entities" 
+                        class="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <i class="fas fa-tags mr-2"></i> Extract Entities
+                </button>
+                <button id="summarize" 
+                        class="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                    <i class="fas fa-compress-alt mr-2"></i> Summarize
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let conversationId = null;
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const typingIndicator = document.querySelector('.typing-indicator');
+        const analyzeSentimentBtn = document.getElementById('analyze-sentiment');
+        const extractEntitiesBtn = document.getElementById('extract-entities');
+        const summarizeBtn = document.getElementById('summarize');
+
+        function showTypingIndicator() {
+            typingIndicator.classList.add('active');
+        }
+
+        function hideTypingIndicator() {
+            typingIndicator.classList.remove('active');
+        }
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message p-3 rounded-lg ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = content;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Disable input and show typing indicator
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            
+            // Add user message to chat
+            addMessage(message, true);
+            messageInput.value = '';
+            
+            showTypingIndicator();
+
+            try {
+                let response;
+                if (!conversationId) {
+                    // Start new conversation
+                    response = await fetch('/start_conversation', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message })
+                    });
+                } else {
+                    // Continue existing conversation
+                    response = await fetch('/continue_conversation', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message })
+                    });
+                }
+
+                const data = await response.json();
+                if (data.error) {
+                    addMessage(`Error: ${data.error}`);
+                    return;
+                }
+
+                conversationId = data.conversation_id;
+                hideTypingIndicator();
+                addMessage(data.response);
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage('Error: Failed to send message');
+                console.error(error);
+            } finally {
+                // Re-enable input
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                messageInput.focus();
+            }
+        }
+
+        async function analyzeText(endpoint) {
+            const message = messageInput.value.trim();
+            if (!message) {
+                alert('Please enter some text to analyze');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: message })
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    alert(`Error: ${data.error}`);
+                    return;
+                }
+
+                addMessage(`Analysis Result: ${JSON.stringify(data, null, 2)}`);
+            } catch (error) {
+                addMessage('Error: Failed to analyze text');
+                console.error(error);
+            }
+        }
+
+        // Event Listeners
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        analyzeSentimentBtn.addEventListener('click', () => analyzeText('analyze_sentiment'));
+        extractEntitiesBtn.addEventListener('click', () => analyzeText('extract_entities'));
+        summarizeBtn.addEventListener('click', () => analyzeText('summarize'));
+
+        // Focus input on load
+        messageInput.focus();
+    </script>
+</body>
+</html> 

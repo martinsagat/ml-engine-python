@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Car Price Prediction</h1>
+            
+            <!-- Prediction Form -->
+            <form id="prediction-form" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Mileage (km)</label>
+                        <input type="number" name="mileage" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Age (years)</label>
+                        <input type="number" name="age" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Engine Size (L)</label>
+                        <input type="number" name="engine_size" step="0.1" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Horsepower</label>
+                        <input type="number" name="horsepower" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Fuel Efficiency (L/100km)</label>
+                        <input type="number" name="fuel_efficiency" step="0.1" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <div class="flex justify-center space-x-4">
+                    <button type="submit"
+                            class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-calculator mr-2"></i> Predict Price
+                    </button>
+                    <button type="button" id="train-button"
+                            class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <i class="fas fa-brain mr-2"></i> Train Model
+                    </button>
+                </div>
+            </form>
+
+            <!-- Prediction Result -->
+            <div id="prediction-result" class="mt-8 hidden">
+                <h2 class="text-xl font-semibold mb-4">Prediction Result</h2>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p class="text-center text-lg">
+                        Predicted Price: <span id="predicted-price" class="font-bold text-blue-600"></span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Example Predictions -->
+            <div class="mt-8">
+                <h2 class="text-xl font-semibold mb-4">Example Predictions</h2>
+                <button id="load-examples"
+                        class="mb-4 bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <i class="fas fa-list mr-2"></i> Load Examples
+                </button>
+                <div id="examples-container" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const predictionForm = document.getElementById('prediction-form');
+        const predictionResult = document.getElementById('prediction-result');
+        const predictedPrice = document.getElementById('predicted-price');
+        const trainButton = document.getElementById('train-button');
+        const loadExamplesButton = document.getElementById('load-examples');
+        const examplesContainer = document.getElementById('examples-container');
+
+        predictionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(predictionForm);
+            const data = {
+                mileage: formData.get('mileage'),
+                age: formData.get('age'),
+                engine_size: formData.get('engine_size'),
+                horsepower: formData.get('horsepower'),
+                fuel_efficiency: formData.get('fuel_efficiency')
+            };
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    predictionResult.classList.remove('hidden');
+                    predictedPrice.textContent = `$${result.predicted_price.toFixed(2)}`;
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert('Failed to get prediction');
+                console.error(error);
+            }
+        });
+
+        trainButton.addEventListener('click', async () => {
+            try {
+                trainButton.disabled = true;
+                trainButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Training...';
+
+                const response = await fetch('/train', {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Model training completed successfully!');
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert('Failed to train model');
+                console.error(error);
+            } finally {
+                trainButton.disabled = false;
+                trainButton.innerHTML = '<i class="fas fa-brain mr-2"></i> Train Model';
+            }
+        });
+
+        loadExamplesButton.addEventListener('click', async () => {
+            try {
+                loadExamplesButton.disabled = true;
+                loadExamplesButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Loading...';
+
+                const response = await fetch('/examples');
+                const result = await response.json();
+
+                if (result.success) {
+                    examplesContainer.innerHTML = result.examples.map(example => `
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <h3 class="font-semibold">Features:</h3>
+                                    <ul class="list-disc list-inside">
+                                        <li>Mileage: ${example.features.mileage.toFixed(2)} km</li>
+                                        <li>Age: ${example.features.age} years</li>
+                                        <li>Engine Size: ${example.features.engine_size}L</li>
+                                        <li>Horsepower: ${example.features.horsepower}</li>
+                                        <li>Fuel Efficiency: ${example.features.fuel_efficiency}L/100km</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">Prices:</h3>
+                                    <p>Actual: $${example.actual_price.toFixed(2)}</p>
+                                    <p>Predicted: $${example.predicted_price.toFixed(2)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    alert(`Error: ${result.error}`);
+                }
+            } catch (error) {
+                alert('Failed to load examples');
+                console.error(error);
+            } finally {
+                loadExamplesButton.disabled = false;
+                loadExamplesButton.innerHTML = '<i class="fas fa-list mr-2"></i> Load Examples';
+            }
+        });
+    </script>
+</body>
+</html> 

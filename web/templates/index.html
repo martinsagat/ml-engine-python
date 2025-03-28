@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Price Predictor</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Car Price Predictor</h1>
+            <p>Enter car details to predict its market value</p>
+        </header>
+
+        <main>
+            <form id="carForm" class="prediction-form">
+                <div class="form-group">
+                    <label for="mileage">Mileage (km)</label>
+                    <input type="number" id="mileage" name="mileage" required min="0" step="1000">
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age (years)</label>
+                    <input type="number" id="age" name="age" required min="0" max="30">
+                </div>
+
+                <div class="form-group">
+                    <label for="engineSize">Engine Size (L)</label>
+                    <input type="number" id="engineSize" name="engineSize" required min="0.8" max="8.0" step="0.1">
+                </div>
+
+                <div class="form-group">
+                    <label for="horsepower">Horsepower</label>
+                    <input type="number" id="horsepower" name="horsepower" required min="60" max="1000">
+                </div>
+
+                <div class="form-group">
+                    <label for="fuelEfficiency">Fuel Efficiency (L/100km)</label>
+                    <input type="number" id="fuelEfficiency" name="fuelEfficiency" required min="3" max="20" step="0.1">
+                </div>
+
+                <button type="submit" class="predict-button">Predict Price</button>
+            </form>
+
+            <div id="result" class="result-container hidden">
+                <h2>Predicted Price</h2>
+                <div class="price-display">
+                    <span id="predictedPrice" class="price">$0</span>
+                </div>
+                <button id="resetButton" class="reset-button">Try Another Car</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>Powered by Machine Learning</p>
+        </footer>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html> 
